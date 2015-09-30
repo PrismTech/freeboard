@@ -6,6 +6,9 @@ freeboard
 1. the distance between the waterline and the main deck or weather deck of a ship or between the level of the water and the upper edge of the side of a small boat.
 2. the act of freeing data from below the "waterline" and exposing it to the world.
 3. a damn-sexy, open source real-time dashboard builder/viewer for IOT and other web mashups.
+ 
+### PrismTech Vortex Fork
+This fork of freeboard includes a thirdparty plugin to use [PrismTech Vortex](http://www.prismtech.com/vortex) as a data source. It connects to the Vortex global dataspace through [Vortex Web](http://www.prismtech.com/vortex/vortex-web). Therefore you need an instance of [Vortex Web](http://www.prismtech.com/vortex/vortex-web) running as a prerequisite for this plugin. 
 
 ### Demo
 http://freeboard.github.io/freeboard
