@@ -29,6 +29,7 @@
                 name : "url",
                 display_name : "URL",
                 type : "text",
+                default_value: "ws://demo-test.prismtech.com:9000",
                 description  : "The URL for the Vortex Web server.",
                 required : true
             },
