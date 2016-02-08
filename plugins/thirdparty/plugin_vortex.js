@@ -29,7 +29,7 @@
                 name : "url",
                 display_name : "URL",
                 type : "text",
-                default_value: "ws://demo-test.prismtech.com:9000",
+                default_value: "ws://localhost:9000",
                 description  : "The URL for the Vortex Web server.",
                 required : true
             },
@@ -52,7 +52,7 @@
                 display_name: "Time Filter",
                 type        : "text",
                 default_value: "0",
-                description  : "The Topic type for the data source."
+                description  : "The timeFilter for the data source."
             },
             {
                 name        : "topicType",
@@ -81,8 +81,8 @@
     {
         var self = this;
         var currentSettings = settings;
-        var runtime = createVortex();
         var dr = null;
+        var runtime;
 
         var onOpen=function()
         {
@@ -110,7 +110,7 @@
 
 
             var type =
-                currentSettings.topicType == 'Auto' ? 'org.omg.dds.types.JSONTopicType' : currentSettings.type
+                currentSettings.topicType == 'Auto' ? 'org.omg.dds.types.JSONTopicType' : currentSettings.topicType
 
             console.log ("Topic Type: " + type)
             var parts = currentSettings.topic.split('/');
@@ -130,28 +130,32 @@
                 topicName,
                 new dds.TopicQos(dds.Reliability.BestEffort),
                 type);
+            
+            topic.onregistered = function() {
+                console.log('Topic is registered, creating the data reader.');
+                dr = new dds.DataReader(runtime, topic, drQos);
+                var listener = function (data) {
+                    console.log(data);
+                    updateCallback (data)
+                };
+                dr.addListener(listener);
+            }
+            
+            console.log('Asking runtime to registerTopic');
             runtime.registerTopic(topic);
-            dr = new dds.DataReader(runtime, topic, drQos);
-            var listener = function (data) {
-                updateCallback (data)
-            };
-            dr.addListener(listener);
+            console.log('Asking runtime to registerTopic - done');
         }
 
 
         var onClose=function()
         {
             console.info("Vortex(%s) Closed", currentSettings.url);
-        };
-
-        var onData=function(data)
-        {
-            updateCallback(data);
+            if(runtime) runtime.close();
         };
 
         function createVortex()
         {
-            if(vortex) vortex.close();
+            if(runtime) runtime.close();
 
             var url=currentSettings.url;
             var vortex = new dds.runtime.Runtime();
@@ -175,21 +179,23 @@
 
         self.updateNow = function()
         {
-            //createVortex();
+            runtime = createVortex();
         };
 
         this.onDispose = function()
         {
-            vortex.close();
-            vortex = {};
+            runtime.close();
+            runtime = null;
         };
 
         this.onSettingsChanged = function(newSettings)
         {
             currentSettings = newSettings;
 
-            createVortex();
+            runtime = createVortex();
         };
+
+        runtime = createVortex();
     };
 
 
