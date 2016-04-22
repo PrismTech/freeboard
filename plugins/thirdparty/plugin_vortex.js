@@ -15,7 +15,7 @@
 (function()
 {
     var pluginRef =
-      window.location.href.toString() + "plugins/thirdparty/vortex-web-client.js";
+      window.location.origin.toString() + "/plugins/thirdparty/vortex-web-client.js";
     console.log ("Loading Plug-in: " + pluginRef);
 
     freeboard.loadDatasourcePlugin({
