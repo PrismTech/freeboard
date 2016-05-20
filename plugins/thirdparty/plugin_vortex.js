@@ -66,7 +66,14 @@
                 display_name: "Best Effort",
                 type        : "boolean",
                 default_value: "true",
-                description  : "Control wether the data is received reliably or in best-effort manner."
+                description  : "Control whether the data is received reliably or in best-effort manner."
+            },
+            {
+                name        : "transient",
+                display_name: "Transient",
+                type        : "boolean",
+                default_value: "false",
+                description  : "Control whether the data is transient durability data should be recieved."
             }
 
         ],
@@ -95,6 +102,9 @@
             if (dr != null) dr.close();
 
             var reliability = currentSettings.bestEffort ? dds.Reliability.BestEffort : dds.Reliability.Reliable;
+            var durability = currentSettings.transient ? dds.Durability.Transient : dds.Durability.Volatile;
+            var tQos = new dds.TopicQos(reliability);
+            tQos = tQos.add(durability);
             var drQos = new dds.DataReaderQos(reliability);
 
             var cf = currentSettings.contentFilter;
@@ -128,9 +138,9 @@
 
             var topic = new dds.Topic(0,
                 topicName,
-                new dds.TopicQos(dds.Reliability.BestEffort),
+                tQos,
                 type);
-            
+
             topic.onregistered = function() {
                 console.log('Topic is registered, creating the data reader.');
                 dr = new dds.DataReader(runtime, topic, drQos);
@@ -140,7 +150,7 @@
                 };
                 dr.addListener(listener);
             }
-            
+
             console.log('Asking runtime to registerTopic');
             runtime.registerTopic(topic);
             console.log('Asking runtime to registerTopic - done');
